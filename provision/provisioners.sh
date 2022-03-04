@@ -37,7 +37,9 @@ function provisioner_end() {
   else
     vvv_error " ! The <b>'${VVV_PROVISIONER_RUNNING}'</b><error> provisioner ran into problems, the full log is available at <b>'${VVV_CURRENT_LOG_FILE}'</b><error>. It completed in <b>${elapsed}</b><error> seconds."
   fi
-  /srv/config/homebin/vvv_restore_php_default
+  if [[readlink -f $("which /usr/bin/php") != *"${VVV_BASE_PHPVERSION}"*]]; then
+    /srv/config/homebin/vvv_restore_php_default
+  fi
   trap - EXIT
 }
 
