@@ -24,14 +24,6 @@ VVV_PATH_TO_SITE=${VM_DIR} # used in site templates
 VVV_SITE_NAME=${SITE}
 VVV_HOSTS=""
 
-local DEFAULTPHP=$(vvv_get_site_config_value 'php' "${VVV_BASE_PHPVERSION}")
-echo " * Setting the default PHP CLI version ( ${DEFAULTPHP} ) for this site"
-update-alternatives --set php "/usr/bin/php${DEFAULTPHP}"
-update-alternatives --set phar "/usr/bin/phar${DEFAULTPHP}"
-update-alternatives --set phar.phar "/usr/bin/phar.phar${DEFAULTPHP}"
-update-alternatives --set phpize "/usr/bin/phpize${DEFAULTPHP}"
-update-alternatives --set php-config "/usr/bin/php-config${DEFAULTPHP}"
-
 SUCCESS=1
 
 VVV_CONFIG=/vagrant/config.yml
@@ -50,6 +42,14 @@ VVV_CONFIG=/vagrant/config.yml
 function get_config_value() {
   vvv_get_site_config_value "custom.${1}" "${2}"
 }
+
+local DEFAULTPHP=$(vvv_get_site_config_value 'php' "${VVV_BASE_PHPVERSION}")
+echo " * Setting the default PHP CLI version ( ${DEFAULTPHP} ) for this site"
+update-alternatives --set php "/usr/bin/php${DEFAULTPHP}"
+update-alternatives --set phar "/usr/bin/phar${DEFAULTPHP}"
+update-alternatives --set phar.phar "/usr/bin/phar.phar${DEFAULTPHP}"
+update-alternatives --set phpize "/usr/bin/phpize${DEFAULTPHP}"
+update-alternatives --set php-config "/usr/bin/php-config${DEFAULTPHP}"
 
 # @description Retrieves a list of hosts for this site from the config file. Internally this relies on `shyaml get-values-0`
 #
