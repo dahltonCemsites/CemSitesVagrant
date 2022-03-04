@@ -11,6 +11,7 @@ permalink: /docs/en-US/changelog/
 ### Enhancements
 
 * VVV now switches to Parallels by default on Arm machines ( #2560 )
+* It is possible to define the PHP version to use during the provision ( #2583 )
 
 ## 3.8.1 ( 2021 November 15th )
 
