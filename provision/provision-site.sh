@@ -350,21 +350,22 @@ function vvv_custom_folder_composer() {
   if keys=$(shyaml keys -y -q "sites.${SITE_ESCAPED}.folders.${folder}.composer" < "${VVV_CONFIG}"); then
       for key in $keys; do
         cd "${folder}"
+        local PHP_VERSION=$(vvv_get_site_config_value 'php' "${VVV_BASE_PHPVERSION}")
         local value=$(vvv_get_site_config_value "folders.${folder}.composer.${key}" "")
         if [[ "install" == "${key}" ]]; then
           if [[ "True" == "${value}" ]]; then
             vvv_info " * Running composer install in ${folder}"
-            noroot composer install
+            noroot "${PHP_VERSION}" composer install
           fi
         elif [[ "update" == "${key}" ]]; then
           if [[ "True" == "${value}" ]]; then
             vvv_info " * Running composer update in ${folder}"
-            noroot composer update
+            noroot "${PHP_VERSION}" composer update
           fi
         elif [[ "
         project" == "${key}" ]]; then
           vvv_info " * Running composer create-project ${value} in ${folder}"
-          noroot composer create-project "${value}" .
+          noroot "${PHP_VERSION}" composer create-project "${value}" .
         else
           vvv_warn " * Unknown key in Composer section: <b>${key}</b><warn> for </warn><b>${folder}</b>"
         fi
