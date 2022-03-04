@@ -30,6 +30,23 @@ VVV_CONFIG=/vagrant/config.yml
 
 . "/srv/provision/provisioners.sh"
 
+# @description Retrieves a config value for the given site as specified in `config.yml`
+#
+# @arg $1 string the config value to fetch
+# @arg $2 string the default value
+function vvv_get_site_config_value() {
+  local value=$(shyaml -q get-value "sites.${SITE_ESCAPED}.${1}" "${2}" < ${VVV_CONFIG})
+  echo "${value}"
+}
+
+DEFAULTPHP=$(vvv_get_site_config_value 'php' "${VVV_BASE_PHPVERSION}")
+echo " * Setting the default PHP CLI version ( ${DEFAULTPHP} ) for this site"
+update-alternatives --set php "/usr/bin/php${DEFAULTPHP}"
+update-alternatives --set phar "/usr/bin/phar${DEFAULTPHP}"
+update-alternatives --set phar.phar "/usr/bin/phar.phar${DEFAULTPHP}"
+update-alternatives --set phpize "/usr/bin/phpize${DEFAULTPHP}"
+update-alternatives --set php-config "/usr/bin/php-config${DEFAULTPHP}"
+
 # @description Takes 2 values, a key to fetch a value for, and an optional default value
 #
 # @example
@@ -42,14 +59,6 @@ VVV_CONFIG=/vagrant/config.yml
 function get_config_value() {
   vvv_get_site_config_value "custom.${1}" "${2}"
 }
-
-local DEFAULTPHP=$(vvv_get_site_config_value 'php' "${VVV_BASE_PHPVERSION}")
-echo " * Setting the default PHP CLI version ( ${DEFAULTPHP} ) for this site"
-update-alternatives --set php "/usr/bin/php${DEFAULTPHP}"
-update-alternatives --set phar "/usr/bin/phar${DEFAULTPHP}"
-update-alternatives --set phar.phar "/usr/bin/phar.phar${DEFAULTPHP}"
-update-alternatives --set phpize "/usr/bin/phpize${DEFAULTPHP}"
-update-alternatives --set php-config "/usr/bin/php-config${DEFAULTPHP}"
 
 # @description Retrieves a list of hosts for this site from the config file. Internally this relies on `shyaml get-values-0`
 #
@@ -327,14 +336,6 @@ function vvv_provision_site_nginx() {
   fi
 }
 
-# @description Retrieves a config value for the given site as specified in `config.yml`
-#
-# @arg $1 string the config value to fetch
-# @arg $2 string the default value
-function vvv_get_site_config_value() {
-  local value=$(shyaml -q get-value "sites.${SITE_ESCAPED}.${1}" "${2}" < ${VVV_CONFIG})
-  echo "${value}"
-}
 
 # @description Clones a git repository into a sites sub-folder
 #
