@@ -38,8 +38,8 @@ function vvv_get_site_config_value() {
   local value=$(shyaml -q get-value "sites.${SITE_ESCAPED}.${1}" "${2}" < ${VVV_CONFIG})
   echo "${value}"
 }
-
-if [[readlink -f $("which /usr/bin/php") != *"${VVV_BASE_PHPVERSION}"*]]; then
+php_version=$(readlink -f $("which /usr/bin/php"))
+if [[ php_version != *"${VVV_BASE_PHPVERSION}"* ]]; then
   DEFAULTPHP=$(vvv_get_site_config_value 'php' "${VVV_BASE_PHPVERSION}")
   echo " * Setting the default PHP CLI version ( ${DEFAULTPHP} ) for this site"
   update-alternatives --set php "/usr/bin/php${DEFAULTPHP}"
@@ -47,6 +47,7 @@ if [[readlink -f $("which /usr/bin/php") != *"${VVV_BASE_PHPVERSION}"*]]; then
   update-alternatives --set phar.phar "/usr/bin/phar.phar${DEFAULTPHP}"
   update-alternatives --set phpize "/usr/bin/phpize${DEFAULTPHP}"
   update-alternatives --set php-config "/usr/bin/php-config${DEFAULTPHP}"
+php_version=$(readlink -f $("which /usr/bin/php"))
 fi
 
 # @description Takes 2 values, a key to fetch a value for, and an optional default value
@@ -515,7 +516,7 @@ if [ "${SUCCESS}" -ne "0" ]; then
   exit 1
 fi
 
-if [[readlink -f $("which /usr/bin/php") != *"${VVV_BASE_PHPVERSION}"*]]; then
+if [[ php_version != *"${VVV_BASE_PHPVERSION}"* ]]; then
   /srv/config/homebin/vvv_restore_php_default
 fi
 
