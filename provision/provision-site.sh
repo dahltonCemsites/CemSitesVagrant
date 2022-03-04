@@ -24,6 +24,14 @@ VVV_PATH_TO_SITE=${VM_DIR} # used in site templates
 VVV_SITE_NAME=${SITE}
 VVV_HOSTS=""
 
+local DEFAULTPHP=$(vvv_get_site_config_value 'php' "${VVV_BASE_PHPVERSION}")
+echo " * Setting the default PHP CLI version ( ${DEFAULTPHP} ) for this site"
+update-alternatives --set php "/usr/bin/php${DEFAULTPHP}"
+update-alternatives --set phar "/usr/bin/phar${DEFAULTPHP}"
+update-alternatives --set phar.phar "/usr/bin/phar.phar${DEFAULTPHP}"
+update-alternatives --set phpize "/usr/bin/phpize${DEFAULTPHP}"
+update-alternatives --set php-config "/usr/bin/php-config${DEFAULTPHP}"
+
 SUCCESS=1
 
 VVV_CONFIG=/vagrant/config.yml
@@ -350,22 +358,21 @@ function vvv_custom_folder_composer() {
   if keys=$(shyaml keys -y -q "sites.${SITE_ESCAPED}.folders.${folder}.composer" < "${VVV_CONFIG}"); then
       for key in $keys; do
         cd "${folder}"
-        local PHP_VERSION=$(vvv_get_site_config_value 'php' "${VVV_BASE_PHPVERSION}")
         local value=$(vvv_get_site_config_value "folders.${folder}.composer.${key}" "")
         if [[ "install" == "${key}" ]]; then
           if [[ "True" == "${value}" ]]; then
             vvv_info " * Running composer install in ${folder}"
-            noroot "${PHP_VERSION}" composer install
+            noroot composer install
           fi
         elif [[ "update" == "${key}" ]]; then
           if [[ "True" == "${value}" ]]; then
             vvv_info " * Running composer update in ${folder}"
-            noroot "${PHP_VERSION}" composer update
+            noroot composer update
           fi
         elif [[ "
         project" == "${key}" ]]; then
           vvv_info " * Running composer create-project ${value} in ${folder}"
-          noroot "${PHP_VERSION}" composer create-project "${value}" .
+          noroot composer create-project "${value}" .
         else
           vvv_warn " * Unknown key in Composer section: <b>${key}</b><warn> for </warn><b>${folder}</b>"
         fi
@@ -505,5 +512,7 @@ if [ "${SUCCESS}" -ne "0" ]; then
   vvv_error " ! ${SITE} provisioning had some issues, check the log files as the site may not function correctly."
   exit 1
 fi
+
+vvv_restore_php_default
 
 provisioner_success
