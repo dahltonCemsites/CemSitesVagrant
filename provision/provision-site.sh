@@ -38,17 +38,20 @@ function vvv_get_site_config_value() {
   local value=$(shyaml -q get-value "sites.${SITE_ESCAPED}.${1}" "${2}" < ${VVV_CONFIG})
   echo "${value}"
 }
+
+# @description Reset the PHP global version to the default
+function vvv_set_php_cli_version() {
 php_version=$(readlink -f /usr/bin/php)
 if [[ $php_version != *"${VVV_BASE_PHPVERSION}"* ]]; then
   DEFAULTPHP=$(vvv_get_site_config_value 'php' "${VVV_BASE_PHPVERSION}")
   echo " * Setting the default PHP CLI version ( ${DEFAULTPHP} ) for this site"
-  noroot update-alternatives --set php "/usr/bin/php${DEFAULTPHP}"
-  noroot update-alternatives --set phar "/usr/bin/phar${DEFAULTPHP}"
-  noroot update-alternatives --set phar.phar "/usr/bin/phar.phar${DEFAULTPHP}"
-  noroot update-alternatives --set phpize "/usr/bin/phpize${DEFAULTPHP}"
-  noroot update-alternatives --set php-config "/usr/bin/php-config${DEFAULTPHP}"
-  php_version=$(readlink -f /usr/bin/php)
+  update-alternatives --set php "/usr/bin/php${DEFAULTPHP}"
+  update-alternatives --set phar "/usr/bin/phar${DEFAULTPHP}"
+  update-alternatives --set phar.phar "/usr/bin/phar.phar${DEFAULTPHP}"
+  update-alternatives --set phpize "/usr/bin/phpize${DEFAULTPHP}"
+  update-alternatives --set php-config "/usr/bin/php-config${DEFAULTPHP}"
 fi
+}
 
 # @description Takes 2 values, a key to fetch a value for, and an optional default value
 #
@@ -484,6 +487,7 @@ function vvv_custom_folders() {
 }
 
 # -------------------------------
+vvv_reset_php_cli_version()
 
 if [[ true == "${SKIP_PROVISIONING}" ]]; then
   vvv_warn " * Skipping provisioning of <b>${SITE}</b>"
@@ -516,8 +520,6 @@ if [ "${SUCCESS}" -ne "0" ]; then
   exit 1
 fi
 
-if [[ $php_version != *"${VVV_BASE_PHPVERSION}"* ]]; then
-  noroot /srv/config/homebin/vvv_restore_php_default
-fi
+/srv/config/homebin/vvv_restore_php_default
 
 provisioner_success
