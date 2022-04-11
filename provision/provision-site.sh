@@ -487,7 +487,7 @@ function vvv_custom_folders() {
 }
 
 # -------------------------------
-vvv_reset_php_cli_version()
+vvv_set_php_cli_version()
 
 if [[ true == "${SKIP_PROVISIONING}" ]]; then
   vvv_warn " * Skipping provisioning of <b>${SITE}</b>"
